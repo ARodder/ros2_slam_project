@@ -1,6 +1,7 @@
 #ifndef CAMERA_NODE__CAMERA_NODE_HPP_
 #define CAMERA_NODE__CAMERA_NODE_HPP_
 
+#include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
@@ -12,7 +13,7 @@ public:
   CameraNode();
 
 private:
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_;
+  image_transport::Publisher image_pub_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::uint32_t frame_count_;
 

@@ -9,13 +9,14 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(image_transport REQUIRED)
 find_package(OpenCV REQUIRED)
 
 add_executable(camera_node src/camera_node.cpp)
 target_include_directories(camera_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(camera_node rclcpp sensor_msgs)
+ament_target_dependencies(camera_node rclcpp sensor_msgs image_transport)
 target_include_directories(camera_node PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(camera_node ${OpenCV_LIBS})
 

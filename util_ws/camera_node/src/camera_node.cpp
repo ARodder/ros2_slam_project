@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 CameraNode::CameraNode()
 : Node("camera_node"), frame_count_(0)
 {
-  image_pub_ = this->create_publisher<sensor_msgs::msg::Image>("camera/image_raw", 10);
+  image_pub_ = image_transport::create_publisher(this, "camera/image_raw");
 
   timer_ = this->create_wall_timer(500ms, std::bind(&CameraNode::on_timer, this));
 
@@ -44,7 +44,7 @@ void CameraNode::on_timer()
   msg.step = static_cast<sensor_msgs::msg::Image::_step_type>(frame.step);
   msg.data.assign(frame.datastart, frame.dataend);
 
-  image_pub_->publish(msg);
+  image_pub_.publish(msg);
   ++frame_count_;
 }
 
