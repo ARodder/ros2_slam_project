@@ -214,7 +214,7 @@ private:
         } catch (...) {}
     }
 
-    void send_velocity(double x, double y, double yaw) {
+    void send_velocity(double x, double /* y */, double yaw) {
         int16_t linear_vel = static_cast<int16_t>(x * 1000);
         int16_t angular_vel = static_cast<int16_t>(yaw * 1000);
         static uint8_t tmp[11];
