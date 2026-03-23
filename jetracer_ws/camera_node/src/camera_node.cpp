@@ -1,42 +1,76 @@
 #include "camera_node.hpp"
 
 #include <chrono>
-#include <string>
-
 #include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 
 using namespace std::chrono_literals;
 
 CameraNode::CameraNode()
 : Node("camera_node"), frame_count_(0)
 {
-  image_pub_ = image_transport::create_publisher(this, "camera/image_raw");
+  device_index_ = this->declare_parameter<int>("device_index", 0);
+  width_ = this->declare_parameter<int>("width", 640);
+  height_ = this->declare_parameter<int>("height", 480);
+  fps_ = this->declare_parameter<double>("fps", 30.0);
+  frame_id_ = this->declare_parameter<std::string>("frame_id", "camera_frame");
 
-  timer_ = this->create_wall_timer(500ms, std::bind(&CameraNode::on_timer, this));
+  image_pub_ = image_transport::create_publisher(this, "camera/image_raw");
+  open_camera();
+
+  const auto period = std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::duration<double>(1.0 / std::max(fps_, 1.0)));
+  timer_ = this->create_wall_timer(period, std::bind(&CameraNode::on_timer, this));
 
   RCLCPP_INFO(this->get_logger(), "camera_node started");
 }
 
+bool CameraNode::open_camera()
+{
+  if (capture_.isOpened()) {
+    capture_.release();
+  }
+
+  if (!capture_.open(device_index_, cv::CAP_V4L2)) {
+    RCLCPP_ERROR(
+      this->get_logger(),
+      "Failed to open camera device %d",
+      device_index_);
+    return false;
+  }
+
+  capture_.set(cv::CAP_PROP_FRAME_WIDTH, width_);
+  capture_.set(cv::CAP_PROP_FRAME_HEIGHT, height_);
+  capture_.set(cv::CAP_PROP_FPS, fps_);
+
+  RCLCPP_INFO(
+    this->get_logger(),
+    "Opened camera device %d at %.0f FPS",
+    device_index_,
+    fps_);
+  return true;
+}
+
 void CameraNode::on_timer()
 {
-  cv::Mat frame(240, 320, CV_8UC3, cv::Scalar(30, 30, 30));
-  const int radius = 15;
-  const int center_x = radius + static_cast<int>(frame_count_ % (frame.cols - 2 * radius));
-  const int center_y = frame.rows / 2;
-  cv::circle(frame, cv::Point(center_x, center_y), radius, cv::Scalar(0, 200, 255), cv::FILLED);
-  cv::putText(
-    frame,
-    "frame: " + std::to_string(frame_count_),
-    cv::Point(10, 30),
-    cv::FONT_HERSHEY_SIMPLEX,
-    0.7,
-    cv::Scalar(255, 255, 255),
-    2);
+  if (!capture_.isOpened() && !open_camera()) {
+    return;
+  }
+
+  cv::Mat frame;
+  if (!capture_.read(frame) || frame.empty()) {
+    RCLCPP_WARN_THROTTLE(
+      this->get_logger(),
+      *this->get_clock(),
+      5000,
+      "Failed to read frame from camera device %d",
+      device_index_);
+    return;
+  }
 
   sensor_msgs::msg::Image msg;
   msg.header.stamp = this->get_clock()->now();
-  msg.header.frame_id = "camera_frame";
+  msg.header.frame_id = frame_id_;
   msg.height = static_cast<uint32_t>(frame.rows);
   msg.width = static_cast<uint32_t>(frame.cols);
   msg.encoding = "bgr8";
