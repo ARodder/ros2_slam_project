@@ -5,7 +5,7 @@ slam_toolbox:
     # source is /odometry/filtered, which should publish odom->base_footprint.
     odom_frame: odom
     map_frame: map
-    base_frame: base_footprint
+    base_frame: base_link
     scan_topic: /scan
     use_map_saver: true
     mode: mapping
