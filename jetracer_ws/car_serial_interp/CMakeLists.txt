@@ -21,6 +21,10 @@ include_directories(
         ${EIGEN3_INCLUDE_DIRS}
 )
 
+install(DIRECTORY launch config
+        DESTINATION share/${PROJECT_NAME}
+)
+
 add_executable(jetracer_node src/jetracer.cpp)
 add_executable(custom_ekf_node src/custom_ekf_node.cpp)
 

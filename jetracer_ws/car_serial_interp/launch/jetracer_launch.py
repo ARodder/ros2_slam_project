@@ -23,5 +23,27 @@ def generate_launch_description():
             name='custom_ekf_node',
             output='screen',
             parameters=[params]
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_to_imu',
+            arguments=[
+                '--x', '0', '--y', '0', '--z', '0.08',
+                '--roll', '0', '--pitch', '0', '--yaw', '0',
+                '--frame-id', 'base_link',
+                '--child-frame-id', 'base_imu_link'
+            ]
+        ),
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='base_to_laser',
+            arguments=[
+                '--x', '0.12', '--y', '0', '--z', '0.10',
+                '--roll', '0', '--pitch', '0', '--yaw', '0',
+                '--frame-id', 'base_link',
+                '--child-frame-id', 'laser'
+            ]
         )
     ])
