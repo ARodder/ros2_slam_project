@@ -1,0 +1,17 @@
+# Interface sketch for future offboard navigation.
+# This file is documentation-by-configuration for the package structure.
+#
+# Intended flow:
+# 1. offboard_slam runs SLAM/localization and publishes /map and /pose.
+# 2. A future planner/controller node in offboard_navigation accepts goals.
+# 3. That node computes a path and publishes /cmd_vel back to the JetRacer.
+
+navigation:
+  ros__parameters:
+    map_topic: /map
+    pose_topic: /pose
+    cmd_vel_topic: /cmd_vel
+    absolute_goal_topic: /goal_pose
+    relative_goal_topic: /goal_relative
+    path_topic: /planned_path
+    navigation_mode: mapping
