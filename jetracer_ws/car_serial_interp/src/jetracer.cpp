@@ -383,7 +383,7 @@ private:
                             geometry_msgs::msg::TransformStamped odom_trans;
                             odom_trans.header.stamp = now_time;
                             odom_trans.header.frame_id = "odom";
-                            odom_trans.child_frame_id = "base_footprint";
+                            odom_trans.child_frame_id = "base_link";
                             odom_trans.transform.translation.x = odom_list[0];
                             odom_trans.transform.translation.y = odom_list[1];
                             odom_trans.transform.translation.z = 0.0;
@@ -416,7 +416,7 @@ private:
                             q.setRPY(0, 0, odom_list[2]);
                             odom_msg.pose.pose.orientation = tf2::toMsg(q);
 
-                            odom_msg.child_frame_id = "base_footprint";
+                            odom_msg.child_frame_id = "base_link";
                             double dt = (now_time - last_time).seconds();
                             if (dt == 0) dt = 0.02; // Avoid division by zero
 

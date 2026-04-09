@@ -5,7 +5,7 @@ custom_ekf_node:
     output_topic: /odometry/filtered
     publish_tf: true
     odom_frame: odom
-    base_frame: base_footprint
+    base_frame: base_link
     use_imu_yaw: false
     process_noise_x: 0.05
     process_noise_y: 0.05

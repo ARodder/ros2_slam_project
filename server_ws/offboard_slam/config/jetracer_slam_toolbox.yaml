@@ -2,7 +2,7 @@ slam_toolbox:
   ros__parameters:
     # SLAM Toolbox consumes TF in the odom frame rather than subscribing
     # directly to an Odometry topic. In this project, the expected odometry
-    # source is /odometry/filtered, which should publish odom->base_footprint.
+    # source is /odometry/filtered, which should publish odom->base_link.
     odom_frame: odom
     map_frame: map
     base_frame: base_link

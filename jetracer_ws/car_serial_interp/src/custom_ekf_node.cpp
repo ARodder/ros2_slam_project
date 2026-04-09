@@ -8,6 +8,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <tf2_ros/transform_broadcaster.h>
+#include <tf2/LinearMath/Matrix3x3.h>
 #include <Eigen/Dense>
 #include <cmath>
 #include <memory>
@@ -22,7 +23,7 @@ public:
     output_topic_ = declare_parameter<std::string>("output_topic", "/odometry/filtered");
     publish_tf_ = declare_parameter<bool>("publish_tf", true);
     odom_frame_ = declare_parameter<std::string>("odom_frame", "odom");
-    base_frame_ = declare_parameter<std::string>("base_frame", "base_footprint");
+    base_frame_ = declare_parameter<std::string>("base_frame", "base_link");
     use_imu_yaw_ = declare_parameter<bool>("use_imu_yaw", false);
 
     q_x_ = declare_parameter<double>("process_noise_x", 0.05);

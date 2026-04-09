@@ -30,7 +30,7 @@ class CalibrateLinear(Node):
         self.declare_parameter('tolerance', 0.03)
         self.declare_parameter('odom_linear_scale_correction', 1.0)
         self.declare_parameter('start_test', True)
-        self.declare_parameter('base_frame', 'base_footprint')
+        self.declare_parameter('base_frame', 'base_link')
         self.declare_parameter('odom_frame', 'odom')
 
         # Get initial parameter values
