@@ -118,7 +118,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "base_frame",
-            default_value="base_footprint",
+            default_value="base_link",
             description="Expected robot base frame from the JetRacer.",
         ),
         DeclareLaunchArgument(
