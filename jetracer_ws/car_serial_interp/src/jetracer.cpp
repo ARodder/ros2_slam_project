@@ -38,7 +38,7 @@ public:
         // PID params
         this->declare_parameter("kp", 350);
         this->declare_parameter("ki", 120);
-        this->declare_parameter("kd", 0);
+        this->declare_parameter("kd", 50);
         // Coefficient params
         this->declare_parameter("coefficient_a", -0.016073);
         this->declare_parameter("coefficient_b", 0.176183);
@@ -271,7 +271,7 @@ private:
             if (param.get_name() == "kp") { kp_ = param.as_int(); update_params = true; }
             else if (param.get_name() == "ki") { ki_ = param.as_int(); update_params = true; }
             else if (param.get_name() == "kd") { kd_ = param.as_int(); update_params = true; }
-            else if (param.get_name() == "servo_bias") { servo_bias_ = param.as_double(); update_params = true; }
+            else if (param.get_name() == "servo_bias") { servo_bias_ = param.as_int(); update_params = true; }
             else if (param.get_name() == "linear_correction") { linear_correction_ = param.as_double(); update_params = true; }
         }
 
@@ -403,6 +403,14 @@ private:
                             odom_msg.pose.pose.position.x = odom_list[0];
                             odom_msg.pose.pose.position.y = odom_list[1];
                             odom_msg.pose.pose.position.z = 0.0;
+                            odom_msg.pose.covariance = {
+                                0.02, 0,    0,    0,    0,    0,
+                                0,    0.02, 0,    0,    0,    0,
+                                0,    0,    1e6,  0,    0,    0,
+                                0,    0,    0,    1e6,  0,    0,
+                                0,    0,    0,    0,    1e6,  0,
+                                0,    0,    0,    0,    0,    0.05
+                              };
 
                             tf2::Quaternion q;
                             q.setRPY(0, 0, odom_list[2]);
@@ -415,6 +423,14 @@ private:
                             odom_msg.twist.twist.linear.x = odom_list[3]/dt;
                             odom_msg.twist.twist.linear.y = odom_list[4]/dt;
                             odom_msg.twist.twist.angular.z = odom_list[5]/dt;
+                            odom_msg.twist.covariance = {
+                                0.05, 0,    0,    0,    0,    0,
+                                0,    0.05, 0,    0,    0,    0,
+                                0,    0,    1e6,  0,    0,    0,
+                                0,    0,    0,    1e6,  0,    0,
+                                0,    0,    0,    0,    1e6,  0,
+                                0,    0,    0,    0,    0,    0.10
+                              };
 
                             // Covariances (simplified assignment)
                             // ... (fill if needed, mostly 0 or large values for unknown)
