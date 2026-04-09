@@ -151,23 +151,9 @@ def generate_launch_description():
         ),
         LogInfo(
             msg=(
-                "Expected odometry source is /odometry/filtered, but SLAM Toolbox "
-                "uses the TF chain rooted at the odom frame rather than "
-                "subscribing to the Odometry topic directly."
-            )
-        ),
-        LogInfo(
-            msg=(
                 "If SLAM starts but no scans are processed, verify both odom->base "
                 "and base->laser TF are available from the JetRacer or enable "
                 "publish_laser_static_tf."
-            )
-        ),
-        LogInfo(
-            msg=(
-                "Navigation and command arbitration are intentionally kept out of "
-                "this launch file and should live in a separate offboard "
-                "navigation package."
             )
         ),
         laser_static_tf,
