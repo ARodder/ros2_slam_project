@@ -1,13 +1,27 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
 def generate_launch_description():
     pkg_share = get_package_share_directory('car_serial_interp')
     params = os.path.join(pkg_share, 'config', 'custom_ekf.yaml')
+    sllidar_launch = os.path.join(
+        get_package_share_directory('sllidar_ros2'),
+        'launch',
+        'sllidar_a1_launch.py'
+    )
 
     return LaunchDescription([
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(sllidar_launch),
+            launch_arguments={
+                'serial_port': '/dev/ttyACM1',
+            }.items()
+        ),
         Node(
             package='car_serial_interp',
             executable='jetracer_node',
