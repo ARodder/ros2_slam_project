@@ -1,17 +1,18 @@
-# Interface sketch for future offboard navigation.
-# This file is documentation-by-configuration for the package structure.
+# Navigation interfaces for the offboard Nav2 bringup.
 #
-# Intended flow:
-# 1. offboard_slam runs SLAM/localization and publishes /map and /pose.
-# 2. A future planner/controller node in offboard_navigation accepts goals.
-# 3. That node computes a path and publishes /cmd_vel back to the JetRacer.
+# Active flow:
+# 1. slam_toolbox runs in localization mode from a saved pose graph.
+# 2. slam_toolbox publishes /map and the map->odom transform.
+# 3. Nav2 consumes /map, /scan, TF, and filtered odometry.
+# 4. Nav2 publishes /cmd_vel back to the JetRacer.
 
 navigation:
   ros__parameters:
     map_topic: /map
     pose_topic: /pose
+    odom_topic: /odometry/filtered
+    scan_topic: /scan
     cmd_vel_topic: /cmd_vel
-    absolute_goal_topic: /goal_pose
-    relative_goal_topic: /goal_relative
-    path_topic: /planned_path
-    navigation_mode: mapping
+    goal_topic: /goal_pose
+    path_topic: /plan
+    navigation_mode: localization
