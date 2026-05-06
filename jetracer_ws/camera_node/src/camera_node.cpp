@@ -7,8 +7,7 @@
 using namespace std::chrono_literals;
 
 CameraNode::CameraNode()
-: Node("camera_node"), frame_count_(0)
-{
+  : Node("camera_node"), frame_count_(0) {
   device_index_ = this->declare_parameter<int>("device_index", 0);
   width_ = this->declare_parameter<int>("width", 640);
   height_ = this->declare_parameter<int>("height", 480);
@@ -25,8 +24,7 @@ CameraNode::CameraNode()
   RCLCPP_INFO(this->get_logger(), "camera_node started");
 }
 
-bool CameraNode::open_camera()
-{
+bool CameraNode::open_camera() {
   if (capture_.isOpened()) {
     capture_.release();
   }
@@ -51,8 +49,7 @@ bool CameraNode::open_camera()
   return true;
 }
 
-void CameraNode::on_timer()
-{
+void CameraNode::on_timer() {
   if (!capture_.isOpened() && !open_camera()) {
     return;
   }
@@ -82,8 +79,7 @@ void CameraNode::on_timer()
   ++frame_count_;
 }
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<CameraNode>());
   rclcpp::shutdown();

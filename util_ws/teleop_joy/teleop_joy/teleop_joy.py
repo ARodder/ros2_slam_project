@@ -62,7 +62,7 @@ class TeleopJoy(Node):
         # Defensive checks (avoid index errors if a controller has fewer buttons/axes)
         axes_ok = (self.linear_x_axis < len(msg.axes)) and (self.angular_z_axis < len(msg.axes))
 
-        if  axes_ok:
+        if axes_ok:
             self.cmd.linear.x = self.x_speed * msg.axes[self.linear_x_axis]
             # Original script didn't use y; left here if you later want to map it:
             # self.cmd.linear.y = self.y_speed * msg.axes[...]
@@ -85,4 +85,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-

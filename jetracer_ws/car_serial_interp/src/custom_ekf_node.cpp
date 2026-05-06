@@ -14,11 +14,10 @@
 #include <cmath>
 #include <memory>
 
-class CustomEkfNode : public rclcpp::Node
-{
+class CustomEkfNode : public rclcpp::Node {
 public:
-  CustomEkfNode() : Node("custom_ekf_node"), x_(Eigen::Matrix<double, 6, 1>::Zero()), P_(Eigen::Matrix<double, 6, 6>::Identity() * 1e-3)
-  {
+  CustomEkfNode() : Node("custom_ekf_node"), x_(Eigen::Matrix<double, 6, 1>::Zero()),
+                    P_(Eigen::Matrix<double, 6, 6>::Identity() * 1e-3) {
     odom_topic_ = declare_parameter<std::string>("odom_topic", "/odom");
     imu_topic_ = declare_parameter<std::string>("imu_topic", "/imu");
     output_topic_ = declare_parameter<std::string>("output_topic", "/odometry/filtered");
@@ -57,15 +56,13 @@ private:
   using Vector6 = Eigen::Matrix<double, 6, 1>;
   using Matrix6 = Eigen::Matrix<double, 6, 6>;
 
-  static double normalizeAngle(double a)
-  {
+  static double normalizeAngle(double a) {
     while (a > M_PI) a -= 2.0 * M_PI;
     while (a < -M_PI) a += 2.0 * M_PI;
     return a;
   }
 
-  void predict(const rclcpp::Time &stamp)
-  {
+  void predict(const rclcpp::Time &stamp) {
     if (!initialized_) {
       last_stamp_ = stamp;
       return;
@@ -87,28 +84,28 @@ private:
     x_(2) = normalizeAngle(x_(2) + wz * dt);
 
     Matrix6 F = Matrix6::Identity();
-    F(0,2) = (-vx * std::sin(yaw) - vy * std::cos(yaw)) * dt;
-    F(0,3) = std::cos(yaw) * dt;
-    F(0,4) = -std::sin(yaw) * dt;
-    F(1,2) = (vx * std::cos(yaw) - vy * std::sin(yaw)) * dt;
-    F(1,3) = std::sin(yaw) * dt;
-    F(1,4) = std::cos(yaw) * dt;
-    F(2,5) = dt;
+    F(0, 2) = (-vx * std::sin(yaw) - vy * std::cos(yaw)) * dt;
+    F(0, 3) = std::cos(yaw) * dt;
+    F(0, 4) = -std::sin(yaw) * dt;
+    F(1, 2) = (vx * std::cos(yaw) - vy * std::sin(yaw)) * dt;
+    F(1, 3) = std::sin(yaw) * dt;
+    F(1, 4) = std::cos(yaw) * dt;
+    F(2, 5) = dt;
 
     Matrix6 Q = Matrix6::Zero();
-    Q(0,0) = q_x_ * dt;
-    Q(1,1) = q_y_ * dt;
-    Q(2,2) = q_yaw_ * dt;
-    Q(3,3) = q_vx_ * dt;
-    Q(4,4) = q_vy_ * dt;
-    Q(5,5) = q_wz_ * dt;
+    Q(0, 0) = q_x_ * dt;
+    Q(1, 1) = q_y_ * dt;
+    Q(2, 2) = q_yaw_ * dt;
+    Q(3, 3) = q_vx_ * dt;
+    Q(4, 4) = q_vy_ * dt;
+    Q(5, 5) = q_wz_ * dt;
 
     P_ = F * P_ * F.transpose() + Q;
     last_stamp_ = stamp;
   }
 
-  void update(const Eigen::VectorXd &z, const Eigen::MatrixXd &H, const Eigen::MatrixXd &R, bool angle_innovation = false, int angle_index = -1)
-  {
+  void update(const Eigen::VectorXd &z, const Eigen::MatrixXd &H, const Eigen::MatrixXd &R,
+              bool angle_innovation = false, int angle_index = -1) {
     Eigen::VectorXd y = z - H * x_;
     if (angle_innovation && angle_index >= 0 && angle_index < y.size()) {
       y(angle_index) = normalizeAngle(y(angle_index));
@@ -124,8 +121,7 @@ private:
     P_ = (I - K * H) * P_;
   }
 
-  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
-  {
+  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
     double yaw_meas = 0.0;
     {
       tf2::Quaternion q;
@@ -151,27 +147,26 @@ private:
 
     Eigen::Matrix<double, 6, 1> z;
     z << msg->pose.pose.position.x,
-         msg->pose.pose.position.y,
-         yaw_meas,
-         msg->twist.twist.linear.x,
-         msg->twist.twist.linear.y,
-         msg->twist.twist.angular.z;
+        msg->pose.pose.position.y,
+        yaw_meas,
+        msg->twist.twist.linear.x,
+        msg->twist.twist.linear.y,
+        msg->twist.twist.angular.z;
 
     Eigen::Matrix<double, 6, 6> H = Eigen::Matrix<double, 6, 6>::Identity();
     Eigen::Matrix<double, 6, 6> R = Eigen::Matrix<double, 6, 6>::Zero();
-    R(0,0) = covarianceOrDefault(msg->pose.covariance[0], r_odom_x_);
-    R(1,1) = covarianceOrDefault(msg->pose.covariance[7], r_odom_y_);
-    R(2,2) = covarianceOrDefault(msg->pose.covariance[35], r_odom_yaw_);
-    R(3,3) = covarianceOrDefault(msg->twist.covariance[0], r_odom_vx_);
-    R(4,4) = covarianceOrDefault(msg->twist.covariance[7], r_odom_vy_);
-    R(5,5) = covarianceOrDefault(msg->twist.covariance[35], r_odom_wz_);
+    R(0, 0) = covarianceOrDefault(msg->pose.covariance[0], r_odom_x_);
+    R(1, 1) = covarianceOrDefault(msg->pose.covariance[7], r_odom_y_);
+    R(2, 2) = covarianceOrDefault(msg->pose.covariance[35], r_odom_yaw_);
+    R(3, 3) = covarianceOrDefault(msg->twist.covariance[0], r_odom_vx_);
+    R(4, 4) = covarianceOrDefault(msg->twist.covariance[7], r_odom_vy_);
+    R(5, 5) = covarianceOrDefault(msg->twist.covariance[35], r_odom_wz_);
 
     update(z, H, R, true, 2);
     publish(msg->header.stamp);
   }
 
-  void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)
-  {
+  void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg) {
     if (!initialized_) {
       return;
     }
@@ -188,12 +183,12 @@ private:
       z << yaw_meas, msg->angular_velocity.z;
 
       Eigen::Matrix<double, 2, 6> H = Eigen::Matrix<double, 2, 6>::Zero();
-      H(0,2) = 1.0;
-      H(1,5) = 1.0;
+      H(0, 2) = 1.0;
+      H(1, 5) = 1.0;
 
       Eigen::Matrix<double, 2, 2> R = Eigen::Matrix<double, 2, 2>::Zero();
-      R(0,0) = covarianceOrDefault(msg->orientation_covariance[8], r_imu_yaw_);
-      R(1,1) = covarianceOrDefault(msg->angular_velocity_covariance[8], r_imu_wz_);
+      R(0, 0) = covarianceOrDefault(msg->orientation_covariance[8], r_imu_yaw_);
+      R(1, 1) = covarianceOrDefault(msg->angular_velocity_covariance[8], r_imu_wz_);
 
       update(z, H, R, true, 0);
     } else {
@@ -201,10 +196,10 @@ private:
       z << msg->angular_velocity.z;
 
       Eigen::Matrix<double, 1, 6> H = Eigen::Matrix<double, 1, 6>::Zero();
-      H(0,5) = 1.0;
+      H(0, 5) = 1.0;
 
       Eigen::Matrix<double, 1, 1> R;
-      R(0,0) = covarianceOrDefault(msg->angular_velocity_covariance[8], r_imu_wz_);
+      R(0, 0) = covarianceOrDefault(msg->angular_velocity_covariance[8], r_imu_wz_);
 
       update(z, H, R, false, -1);
     }
@@ -212,16 +207,14 @@ private:
     publish(msg->header.stamp);
   }
 
-  double covarianceOrDefault(double value, double fallback) const
-  {
+  double covarianceOrDefault(double value, double fallback) const {
     if (!std::isfinite(value) || value <= 0.0) {
       return fallback;
     }
     return value;
   }
 
-  void publish(const rclcpp::Time &stamp)
-  {
+  void publish(const rclcpp::Time &stamp) {
     nav_msgs::msg::Odometry msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = odom_frame_;
@@ -243,19 +236,19 @@ private:
       msg.twist.covariance[i] = 0.0;
     }
 
-    msg.pose.covariance[0] = P_(0,0);
-    msg.pose.covariance[1] = P_(0,1);
-    msg.pose.covariance[6] = P_(1,0);
-    msg.pose.covariance[7] = P_(1,1);
-    msg.pose.covariance[35] = P_(2,2);
+    msg.pose.covariance[0] = P_(0, 0);
+    msg.pose.covariance[1] = P_(0, 1);
+    msg.pose.covariance[6] = P_(1, 0);
+    msg.pose.covariance[7] = P_(1, 1);
+    msg.pose.covariance[35] = P_(2, 2);
 
     msg.pose.covariance[14] = 1e6;
     msg.pose.covariance[21] = 1e6;
     msg.pose.covariance[28] = 1e6;
 
-    msg.twist.covariance[0] = P_(3,3);
-    msg.twist.covariance[7] = P_(4,4);
-    msg.twist.covariance[35] = P_(5,5);
+    msg.twist.covariance[0] = P_(3, 3);
+    msg.twist.covariance[7] = P_(4, 4);
+    msg.twist.covariance[35] = P_(5, 5);
     msg.twist.covariance[14] = 1e6;
     msg.twist.covariance[21] = 1e6;
     msg.twist.covariance[28] = 1e6;
@@ -297,8 +290,7 @@ private:
   Matrix6 P_;
 };
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<CustomEkfNode>());
   rclcpp::shutdown();

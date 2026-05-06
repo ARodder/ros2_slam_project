@@ -126,7 +126,7 @@ class CalibrateLinear(Node):
                 return
 
             # Compute distance from start
-            distance = math.sqrt((pos.x - self.x_start)**2 + (pos.y - self.y_start)**2)
+            distance = math.sqrt((pos.x - self.x_start) ** 2 + (pos.y - self.y_start) ** 2)
             distance *= self.odom_linear_scale_correction
 
             error = distance - self.test_distance

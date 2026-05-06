@@ -18,7 +18,6 @@ import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
 
-
 INSTRUCTIONS = """
 Keyboard teleop for JetRacer
 ----------------------------
@@ -164,8 +163,8 @@ class MacKeyListener:
 
         self._callback = self._event_callback_type(callback)
         mask = (
-            (1 << self.KCG_EVENT_KEY_DOWN)
-            | (1 << self.KCG_EVENT_KEY_UP)
+                (1 << self.KCG_EVENT_KEY_DOWN)
+                | (1 << self.KCG_EVENT_KEY_UP)
         )
 
         self._tap = self._application_services.CGEventTapCreate(

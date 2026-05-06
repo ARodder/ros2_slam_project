@@ -30,11 +30,9 @@
 using namespace std::chrono_literals;
 using namespace boost::asio;
 
-class JetracerNode : public rclcpp::Node
-{
+class JetracerNode : public rclcpp::Node {
 public:
-    JetracerNode() : Node("jetracer"), io_service_(), serial_port_(io_service_)
-    {
+    JetracerNode() : Node("jetracer"), io_service_(), serial_port_(io_service_) {
         // 1. Declare Parameters (replacing dynamic_reconfigure and param server)
         this->declare_parameter("port_name", "/dev/ttyACM0");
         this->declare_parameter("baud_rate", 115200);
@@ -84,7 +82,7 @@ public:
         // 4. Setup Pubs/Subs/TF
         odom_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
-        imu_pub_  = this->create_publisher<sensor_msgs::msg::Imu>("imu", 10);
+        imu_pub_ = this->create_publisher<sensor_msgs::msg::Imu>("imu", 10);
         odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("odom", 10);
         lvel_pub_ = this->create_publisher<std_msgs::msg::Int32>("motor/lvel", 10);
         rvel_pub_ = this->create_publisher<std_msgs::msg::Int32>("motor/rvel", 10);
@@ -153,9 +151,9 @@ private:
     float linear_correction_;
 
     // --- Serial Protocol Helpers ---
-    uint8_t checksum(uint8_t* buf, size_t len) {
+    uint8_t checksum(uint8_t *buf, size_t len) {
         uint8_t sum = 0x00;
-        for(size_t i=0; i<len; i++) sum += *(buf + i);
+        for (size_t i = 0; i < len; i++) sum += *(buf + i);
         return sum;
     }
 
@@ -179,35 +177,36 @@ private:
         buf[14] = checksum(buf, 14);
 
         try {
-            write(serial_port_, buffer(buf,sizeof(buf)));
-            RCLCPP_INFO(this->get_logger(), "SetParams: p=%d i=%d d=%d corr=%.2f bias=%d", 
-                p, i, d, linear_correction, servo_bias);
-        } catch (...) {}
+            write(serial_port_, buffer(buf, sizeof(buf)));
+            RCLCPP_INFO(this->get_logger(), "SetParams: p=%d i=%d d=%d corr=%.2f bias=%d",
+                        p, i, d, linear_correction, servo_bias);
+        } catch (...) {
+        }
     }
 
     void send_coefficient(float a, float b, float c, float d) {
         uint8_t buf[21];
-        char* p;
+        char *p;
         buf[0] = HEAD1;
         buf[1] = HEAD2;
         buf[2] = 0x15; // length
         buf[3] = SEND_TYPE_COEFFICIENT;
-        p = (char*)&a;
+        p = (char *) &a;
         buf[4] = static_cast<uint8_t>(p[0]);
         buf[5] = static_cast<uint8_t>(p[1]);
         buf[6] = static_cast<uint8_t>(p[2]);
         buf[7] = static_cast<uint8_t>(p[3]);
-        p = (char*)&b;
+        p = (char *) &b;
         buf[8] = static_cast<uint8_t>(p[0]);
         buf[9] = static_cast<uint8_t>(p[1]);
         buf[10] = static_cast<uint8_t>(p[2]);
         buf[11] = static_cast<uint8_t>(p[3]);
-        p = (char*)&c;
+        p = (char *) &c;
         buf[12] = static_cast<uint8_t>(p[0]);
         buf[13] = static_cast<uint8_t>(p[1]);
         buf[14] = static_cast<uint8_t>(p[2]);
         buf[15] = static_cast<uint8_t>(p[3]);
-        p = (char*)&d;
+        p = (char *) &d;
         buf[16] = static_cast<uint8_t>(p[0]);
         buf[17] = static_cast<uint8_t>(p[1]);
         buf[18] = static_cast<uint8_t>(p[2]);
@@ -215,9 +214,10 @@ private:
         buf[20] = checksum(buf, 20);
 
         try {
-            write(serial_port_, buffer(buf,sizeof(buf)));
+            write(serial_port_, buffer(buf, sizeof(buf)));
             RCLCPP_INFO(this->get_logger(), "SetCoefficient: a=%.4f b=%.4f c=%.4f d=%.4f", a, b, c, d);
-        } catch (...) {}
+        } catch (...) {
+        }
     }
 
     void send_velocity(double x, double /* y */, double yaw) {
@@ -237,10 +237,10 @@ private:
         tmp[10] = checksum(tmp, 10);
 
         try {
-            write(serial_port_, buffer(tmp,sizeof(tmp)));
+            write(serial_port_, buffer(tmp, sizeof(tmp)));
         } catch (const std::exception &e) {
             RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 5000,
-                         "send_velocity failed: %s", e.what());
+                                 "send_velocity failed: %s", e.what());
         }
     }
 
@@ -265,20 +265,30 @@ private:
     }
 
     rcl_interfaces::msg::SetParametersResult on_parameter_change(
-        const std::vector<rclcpp::Parameter> &parameters) 
-    {
+        const std::vector<rclcpp::Parameter> &parameters) {
         rcl_interfaces::msg::SetParametersResult result;
         result.successful = true;
         result.reason = "success";
 
         bool update_params = false;
 
-        for (const auto &param : parameters) {
-            if (param.get_name() == "kp") { kp_ = param.as_int(); update_params = true; }
-            else if (param.get_name() == "ki") { ki_ = param.as_int(); update_params = true; }
-            else if (param.get_name() == "kd") { kd_ = param.as_int(); update_params = true; }
-            else if (param.get_name() == "servo_bias") { servo_bias_ = param.as_int(); update_params = true; }
-            else if (param.get_name() == "linear_correction") { linear_correction_ = param.as_double(); update_params = true; }
+        for (const auto &param: parameters) {
+            if (param.get_name() == "kp") {
+                kp_ = param.as_int();
+                update_params = true;
+            } else if (param.get_name() == "ki") {
+                ki_ = param.as_int();
+                update_params = true;
+            } else if (param.get_name() == "kd") {
+                kd_ = param.as_int();
+                update_params = true;
+            } else if (param.get_name() == "servo_bias") {
+                servo_bias_ = param.as_int();
+                update_params = true;
+            } else if (param.get_name() == "linear_correction") {
+                linear_correction_ = param.as_double();
+                update_params = true;
+            }
         }
 
         if (update_params) {
@@ -303,8 +313,8 @@ private:
 
         RCLCPP_INFO(this->get_logger(), "Start receive message");
 
-        while(rclcpp::ok()) {
-            if(!serial_port_.is_open()) {
+        while (rclcpp::ok()) {
+            if (!serial_port_.is_open()) {
                 std::this_thread::sleep_for(1s);
                 continue;
             }
@@ -344,15 +354,15 @@ private:
                         now_time = this->now();
 
                         // IMU Decoding
-                        imu_list[0]=((double)((int16_t)(data[4]*256+data[5]))/32768*2000/180*3.1415);
-                        imu_list[1]=((double)((int16_t)(data[6]*256+data[7]))/32768*2000/180*3.1415);
-                        imu_list[2]=((double)((int16_t)(data[8]*256+data[9]))/32768*2000/180*3.1415);
-                        imu_list[3]=((double)((int16_t)(data[10]*256+data[11]))/32768*2*9.8);
-                        imu_list[4]=((double)((int16_t)(data[12]*256+data[13]))/32768*2*9.8);
-                        imu_list[5]=((double)((int16_t)(data[14]*256+data[15]))/32768*2*9.8);
-                        imu_list[6]=((double)((int16_t)(data[16]*256+data[17]))/10.0);
-                        imu_list[7]=((double)((int16_t)(data[18]*256+data[19]))/10.0);
-                        imu_list[8]=((double)((int16_t)(data[20]*256+data[21]))/10.0);
+                        imu_list[0] = ((double) ((int16_t)(data[4] * 256 + data[5])) / 32768 * 2000 / 180 * 3.1415);
+                        imu_list[1] = ((double) ((int16_t)(data[6] * 256 + data[7])) / 32768 * 2000 / 180 * 3.1415);
+                        imu_list[2] = ((double) ((int16_t)(data[8] * 256 + data[9])) / 32768 * 2000 / 180 * 3.1415);
+                        imu_list[3] = ((double) ((int16_t)(data[10] * 256 + data[11])) / 32768 * 2 * 9.8);
+                        imu_list[4] = ((double) ((int16_t)(data[12] * 256 + data[13])) / 32768 * 2 * 9.8);
+                        imu_list[5] = ((double) ((int16_t)(data[14] * 256 + data[15])) / 32768 * 2 * 9.8);
+                        imu_list[6] = ((double) ((int16_t)(data[16] * 256 + data[17])) / 10.0);
+                        imu_list[7] = ((double) ((int16_t)(data[18] * 256 + data[19])) / 10.0);
+                        imu_list[8] = ((double) ((int16_t)(data[20] * 256 + data[21])) / 10.0);
 
                         // Publish IMU
                         {
@@ -367,7 +377,7 @@ private:
                             imu_msg.linear_acceleration.z = imu_list[5];
 
                             tf2::Quaternion q;
-                            q.setRPY(0, 0, imu_list[8]/180.0*3.1415926);
+                            q.setRPY(0, 0, imu_list[8] / 180.0 * 3.1415926);
                             imu_msg.orientation = tf2::toMsg(q);
 
                             imu_msg.orientation_covariance = {1e6, 0, 0, 0, 1e6, 0, 0, 0, 0.05};
@@ -377,12 +387,12 @@ private:
                         }
 
                         // Odom Decoding
-                        odom_list[0]=((double)((int16_t)(data[22]*256+data[23]))/1000); // x
-                        odom_list[1]=((double)((int16_t)(data[24]*256+data[25]))/1000); // y
-                        odom_list[2]=((double)((int16_t)(data[26]*256+data[27]))/1000); // yaw
-                        odom_list[3]=((double)((int16_t)(data[28]*256+data[29]))/1000); // dx
-                        odom_list[4]=((double)((int16_t)(data[30]*256+data[31]))/1000); // dy
-                        odom_list[5]=((double)((int16_t)(data[32]*256+data[33]))/1000); // dyaw
+                        odom_list[0] = ((double) ((int16_t)(data[22] * 256 + data[23])) / 1000); // x
+                        odom_list[1] = ((double) ((int16_t)(data[24] * 256 + data[25])) / 1000); // y
+                        odom_list[2] = ((double) ((int16_t)(data[26] * 256 + data[27])) / 1000); // yaw
+                        odom_list[3] = ((double) ((int16_t)(data[28] * 256 + data[29])) / 1000); // dx
+                        odom_list[4] = ((double) ((int16_t)(data[30] * 256 + data[31])) / 1000); // dy
+                        odom_list[5] = ((double) ((int16_t)(data[32] * 256 + data[33])) / 1000); // dyaw
 
                         // TF Broadcasting
                         if (publish_odom_tf_) {
@@ -410,13 +420,13 @@ private:
                             odom_msg.pose.pose.position.y = odom_list[1];
                             odom_msg.pose.pose.position.z = 0.0;
                             odom_msg.pose.covariance = {
-                                0.02, 0,    0,    0,    0,    0,
-                                0,    0.02, 0,    0,    0,    0,
-                                0,    0,    1e6,  0,    0,    0,
-                                0,    0,    0,    1e6,  0,    0,
-                                0,    0,    0,    0,    1e6,  0,
-                                0,    0,    0,    0,    0,    0.05
-                              };
+                                0.02, 0, 0, 0, 0, 0,
+                                0, 0.02, 0, 0, 0, 0,
+                                0, 0, 1e6, 0, 0, 0,
+                                0, 0, 0, 1e6, 0, 0,
+                                0, 0, 0, 0, 1e6, 0,
+                                0, 0, 0, 0, 0, 0.05
+                            };
 
                             tf2::Quaternion q;
                             q.setRPY(0, 0, odom_list[2]);
@@ -426,17 +436,17 @@ private:
                             double dt = (now_time - last_time).seconds();
                             if (dt == 0) dt = 0.02; // Avoid division by zero
 
-                            odom_msg.twist.twist.linear.x = odom_list[3]/dt;
-                            odom_msg.twist.twist.linear.y = odom_list[4]/dt;
-                            odom_msg.twist.twist.angular.z = odom_list[5]/dt;
+                            odom_msg.twist.twist.linear.x = odom_list[3] / dt;
+                            odom_msg.twist.twist.linear.y = odom_list[4] / dt;
+                            odom_msg.twist.twist.angular.z = odom_list[5] / dt;
                             odom_msg.twist.covariance = {
-                                0.05, 0,    0,    0,    0,    0,
-                                0,    0.05, 0,    0,    0,    0,
-                                0,    0,    1e6,  0,    0,    0,
-                                0,    0,    0,    1e6,  0,    0,
-                                0,    0,    0,    0,    1e6,  0,
-                                0,    0,    0,    0,    0,    0.10
-                              };
+                                0.05, 0, 0, 0, 0, 0,
+                                0, 0.05, 0, 0, 0, 0,
+                                0, 0, 1e6, 0, 0, 0,
+                                0, 0, 0, 1e6, 0, 0,
+                                0, 0, 0, 0, 1e6, 0,
+                                0, 0, 0, 0, 0, 0.10
+                            };
 
                             // Covariances (simplified assignment)
                             // ... (fill if needed, mostly 0 or large values for unknown)
@@ -446,10 +456,14 @@ private:
                         // Motor Data
                         {
                             std_msgs::msg::Int32 m;
-                            m.data = ((int16_t)(data[34]*256+data[35])); lvel_pub_->publish(m);
-                            m.data = ((int16_t)(data[36]*256+data[37])); rvel_pub_->publish(m);
-                            m.data = ((int16_t)(data[38]*256+data[39])); lset_pub_->publish(m);
-                            m.data = ((int16_t)(data[40]*256+data[41])); rset_pub_->publish(m);
+                            m.data = ((int16_t)(data[34] * 256 + data[35]));
+                            lvel_pub_->publish(m);
+                            m.data = ((int16_t)(data[36] * 256 + data[37]));
+                            rvel_pub_->publish(m);
+                            m.data = ((int16_t)(data[38] * 256 + data[39]));
+                            lset_pub_->publish(m);
+                            m.data = ((int16_t)(data[40] * 256 + data[41]));
+                            rset_pub_->publish(m);
                         }
 
                         last_time = now_time;
@@ -467,7 +481,7 @@ private:
     }
 };
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<JetracerNode>();
     rclcpp::spin(node);
