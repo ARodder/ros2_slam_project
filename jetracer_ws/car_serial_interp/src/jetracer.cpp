@@ -1,3 +1,9 @@
+//
+// Created by Aleksander Røder on 09/02/2026
+// using perplexity.ai with the Gemini 3.1 pro model.
+// with ROS 1 jetracer.cpp as the source from https://github.com/waveshare/jetracer_ros/blob/main/src/jetracer.cpp
+//
+
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>

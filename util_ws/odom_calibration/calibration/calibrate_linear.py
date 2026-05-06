@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 """
-calibrate_linear_ros2.py
+calibrate_linear.py
 
 ROS2 port of calibrate_linear.py:
 Move the robot a specified distance to check the PID parameters of the base controller.
+
+Created by Aleksander Røder using perplexity.ai with the Gemini 3.1 pro model.
+Using the ROS 1 calibrate_linear.py as a source from https://github.com/waveshare/jetracer_ros/blob/main/scripts/calibrate_linear.py
 """
 
 import math

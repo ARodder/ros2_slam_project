@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+"""
+teleop_joy.py
 
+ROS2 port of teleop_joy.py:
+Translates joystick input to velocity commands for the JetRacer.
+
+Created by Aleksander Røder using perplexity.ai with the Gemini 3.1 pro model.
+Using the ROS 1 teleop_joy.py as a source. The script was retrieved from the original ROS 1 jetson Nano Image.
+"""
 import rclpy
 from rclpy.node import Node
 
