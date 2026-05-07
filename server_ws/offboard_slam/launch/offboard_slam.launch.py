@@ -1,3 +1,9 @@
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# Intended for offboard SLAM bringup and later manual refinement.
+#
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -36,7 +42,7 @@ def generate_launch_description():
         offboard_slam_share, "config", "jetracer_slam_toolbox.yaml"
     )
     default_rviz_config = os.path.join(
-        slam_toolbox_share, "config", "slam_toolbox_default.rviz"
+        offboard_slam_share, "config", "offboard_slam.rviz"
     )
 
     slam_launch = IncludeLaunchDescription(

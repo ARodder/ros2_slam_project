@@ -1,3 +1,9 @@
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# Initial interface sketch for offboard navigation topics.
+#
+
 # Navigation interfaces for the offboard Nav2 bringup.
 #
 # Active flow:

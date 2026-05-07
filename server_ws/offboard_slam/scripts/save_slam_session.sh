@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# Helper script for saving offboard SLAM session artifacts.
+#
 
 set -euo pipefail
 

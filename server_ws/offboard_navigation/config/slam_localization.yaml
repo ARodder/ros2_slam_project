@@ -1,3 +1,9 @@
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# Initial SLAM localization parameter scaffold for offboard navigation.
+#
+
 slam_toolbox:
   ros__parameters:
     solver_plugin: solver_plugins::CeresSolver

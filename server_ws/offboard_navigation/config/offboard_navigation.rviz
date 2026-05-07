@@ -1,3 +1,9 @@
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# RViz profile for offboard navigation visualization.
+#
+
 Panels:
   - Class: rviz_common/Displays
     Name: Displays

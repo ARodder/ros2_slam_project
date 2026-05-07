@@ -1,3 +1,9 @@
+#
+# Created using OpenAI Codex.
+# Reviewed and verified by Magnus Mortensen.
+# Intended for offboard navigation structure and later manual refinement.
+#
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
