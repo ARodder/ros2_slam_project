@@ -27,6 +27,7 @@ install(DIRECTORY launch config
 
 add_executable(jetracer_node src/jetracer.cpp)
 add_executable(custom_ekf_node src/custom_ekf_node.cpp)
+add_executable(odom_csv_logger_node src/odom_csv_logger_node.cpp)
 
 ament_target_dependencies(jetracer_node
         rclcpp
@@ -49,12 +50,20 @@ ament_target_dependencies(custom_ekf_node
         tf2_geometry_msgs
 )
 
+ament_target_dependencies(odom_csv_logger_node
+        rclcpp
+        nav_msgs
+        tf2
+)
+
 target_compile_features(jetracer_node PUBLIC cxx_std_17)
 target_compile_features(custom_ekf_node PUBLIC cxx_std_17)
+target_compile_features(odom_csv_logger_node PUBLIC cxx_std_17)
 
 install(TARGETS
         jetracer_node
         custom_ekf_node
+        odom_csv_logger_node
         DESTINATION lib/${PROJECT_NAME}
 )
 

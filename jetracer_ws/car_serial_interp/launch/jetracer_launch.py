@@ -5,9 +5,9 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 import os
 
 
@@ -21,6 +21,11 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'odom_log_output_directory',
+            default_value='odom_logs',
+            description='Directory for odometry CSV logs written when the logger node stops.'
+        ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(sllidar_launch),
             launch_arguments={
@@ -42,6 +47,17 @@ def generate_launch_description():
             name='custom_ekf_node',
             output='screen',
             parameters=[params]
+        ),
+        Node(
+            package='car_serial_interp',
+            executable='odom_csv_logger_node',
+            name='odom_csv_logger_node',
+            output='screen',
+            parameters=[{
+                'odom_topic': '/odom',
+                'filtered_topic': '/odometry/filtered',
+                'output_directory': LaunchConfiguration('odom_log_output_directory')
+            }]
         ),
         Node(
             package='tf2_ros',

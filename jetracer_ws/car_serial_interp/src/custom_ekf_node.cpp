@@ -1,6 +1,5 @@
 //
-// Created by Aleksander Røder on 09/04/2026
-// using perplexity.ai with the Gemini 3.1 pro model.
+// Created using Gemini 3.1 pro on 09/04/2026. Reviewed and modified by Aleksander Røder.
 //
 #include <rclcpp/rclcpp.hpp>
 #include <nav_msgs/msg/odometry.hpp>

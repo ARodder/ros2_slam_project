@@ -1,6 +1,9 @@
 slam_toolbox:
   ros__parameters:
-    odom_frame: odom
+    # SLAM Toolbox consumes TF in the odom frame rather than subscribing
+    # directly to an Odometry topic. In this project, the expected odometry
+    # source is /odometry/filtered, which should publish odom->base_link.
+    odom_frame: odometry/filtered
     map_frame: map
     base_frame: base_link
     scan_topic: /scan
@@ -10,7 +13,7 @@ slam_toolbox:
     debug_logging: false
     throttle_scans: 1
     transform_publish_period: 0.02
-    map_update_interval: 1.0
+    map_update_interval: 5.0
     resolution: 0.05
     restamp_tf: false
     min_laser_range: 0.0
@@ -56,4 +59,3 @@ slam_toolbox:
     use_response_expansion: true
     min_pass_through: 2
     occupancy_threshold: 0.1
-    
