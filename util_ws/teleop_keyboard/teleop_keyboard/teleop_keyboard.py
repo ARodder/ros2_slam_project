@@ -8,6 +8,7 @@ Translates keyboard input to velocity commands for the JetRacer.
 Created by Magnus Mortensen using perplexity.ai with the Gemini 3.1 pro model.
 Using the ROS 1 teleop_keyboard.py as a source. The script was retrieved from the original ROS 1 jetson Nano Image.
 """
+
 import ctypes
 import ctypes.util
 import platform

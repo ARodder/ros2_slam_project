@@ -11,7 +11,7 @@ making the jetRacer work. These are the custom nodes required to run on the jetr
 It containes the following nodes:
  - Jetracer_node(car_serial_interp)
  - custom_ekf_node
-It also contains a camera node which is not yet operational, and a launch file.
+It also contains a camera node which is not yet operational.
 
 ### server_ws
 The server_ws contains the code for the nodes that should run offboard, meaning they
@@ -60,7 +60,92 @@ colcon build
 ```Bash
 source install/setup.bash
 ```
-TODO: add example command of how to run the specific nodes.
 
-Make sure that the Lidar module is running before starting the nodes. If it is not running or the incorrect
-usb port is used, the node will instantly crash.
+### 1. Start the JetRacer-side nodes
+
+On the JetRacer itself, launch the onboard stack from the `car_serial_interp`
+package. This starts the hardware interface, filtered odometry, static sensor
+transforms, lidar bringup, and odometry logger.
+
+```bash
+cd ~/ros2_slam_project/jetracer_ws
+source install/setup.bash
+ros2 launch car_serial_interp jetracer_launch.py
+```
+
+### 2. Drive the JetRacer manually with a joystick
+
+To manually operate the car, first start the standard ROS 2 joystick driver:
+
+```bash
+cd ~/ros2_slam_project/util_ws
+source install/setup.bash
+ros2 run joy joy_node
+```
+
+Then, in a second terminal on the same machine, start the translated teleop
+node:
+
+```bash
+cd ~/ros2_slam_project/util_ws
+source install/setup.bash
+ros2 run teleop_joy teleop_joy
+```
+
+This will allow the operator to drive the JetRacer using the joystick.
+
+### 3. Run offboard SLAM
+
+On the offboard computer connected to the JetRacer over WiFi, start the SLAM
+bringup:
+
+```bash
+cd ~/ros2_slam_project/server_ws
+source install/setup.bash
+ros2 launch offboard_slam offboard_slam.launch.py
+```
+
+This starts `slam_toolbox` and RViz. While manually driving the JetRacer, RViz
+should show the live scan data, TF tree, and generated map.
+
+### 4. Save the generated map and pose graph
+
+After creating a useful map, save both the occupancy map and the SLAM pose
+graph from the offboard computer:
+
+```bash
+cd ~/ros2_slam_project/server_ws
+source install/setup.bash
+ros2 run offboard_slam save_slam_session.sh <map_name>
+```
+
+Example:
+
+```bash
+cd ~/ros2_slam_project/server_ws
+source install/setup.bash
+ros2 run offboard_slam save_slam_session.sh classroom_run
+```
+
+This saves the following artifacts under `server_ws/offboard_slam/maps/`:
+
+- `<map_name>.yaml`
+- `<map_name>.pgm`
+- `<map_name>.posegraph`
+- `<map_name>.data`
+
+It also updates the local `current` aliases in the maps directory.
+
+### Notes
+
+- The JetRacer and offboard computer must use the same `ROS_DOMAIN_ID`.
+- The clocks of the JetRacer and the offboard computer should be synchronized
+  for reliable offboard SLAM.
+- If using sparse clone, make sure the relevant workspace and required
+  third-party packages have been checked out before building.
+- The offboard navigation package exists as a structure and configuration
+  scaffold only. A complete end-to-end navigation stack for sending goals and
+  autonomously driving the JetRacer has not yet been implemented.
+- Make sure that the lidar module is running before starting the nodes. If it
+  is not running, or if the wrong USB port is used, the lidar node will
+  instantly crash.
