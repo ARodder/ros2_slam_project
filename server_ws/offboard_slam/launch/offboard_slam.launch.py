@@ -1,6 +1,5 @@
 #
-# Created using OpenAI Codex.
-# Reviewed and verified by Magnus Mortensen.
+# Created by Magnus Mortensen.
 # Intended for offboard SLAM bringup and later manual refinement.
 #
 

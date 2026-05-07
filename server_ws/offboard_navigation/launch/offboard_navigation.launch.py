@@ -1,6 +1,6 @@
 #
 # Created using OpenAI Codex.
-# Reviewed and verified by Magnus Mortensen.
+# Reviewed, not verified by Magnus Mortensen.
 # Intended for offboard navigation structure and later manual refinement.
 #
 
